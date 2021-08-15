@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %} Home {% endblock %}
+{% block nav %} 
+    {% if user.is_authenticated %}
+        <li class="nav-item">
+            <a href="#" class="nav-link">{{ user|capfirst }}</a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'logout' %}" class='nav-link'>Cerrar Sesión</a>
+        </li>
+    {% else %}
+        <li class='nav-item'>
+            <a href="{% url 'login' %}" class='nav-link'>Iniciar Sesión</a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'register' %}" class='nav-link'>Registrate</a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+    <h1>Página de Inicio</h1>
+
+    <div class="row">
+        <div class="col-sm-6 col-md-4 mb-3 ml-4">
+            <a class="btn btn-warning" href="{% url 'crear' %}">Haz un Post {{user|capfirst}}!</a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for post in posts %}
+            <div class="col-sm-6 col-md-4">
+                <div class="card shadow">
+                    {% if post.imagen.url == '/media/imagen' %}
+                    {% load static %}
+                        <img src="{% static 'not_image.jpg' %}" class='card-img-top'  height="200px" alt="{{ post.titulo }}">
+                    {% else %}
+                        <img src="{{ post.imagen.url }}" class='card-img-top' height="200px" alt="{{post.titulo}}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{post.titulo}}</h5>
+                        <p class="card-text mb-2">{{ post.descripcion }}</p>
+                        <div class="mb-3">
+                            <small>Autor: {{ post.autor }}</small>
+                        </div>
+                        <a href="{% url 'post' post.id %}" class="btn btn-primary">Ver más</a>
+                    </div>
+                </div>
+            </div>    
+        {% endfor %}
+    </div>
+    <div class="d-flex mt-3">
+        {% if posts.has_next %}
+            <div><a href="?page={{ posts.next_page_number }}" class="btn btn-outline-success">Siguiente</a></div>
+        {% endif %}
+        {% if posts.has_previous %}
+            <div><a href="?page={{ posts.previous_page_number }}" class='btn btn-outline-success'>Anterior</a></div>
+        {% endif %}
+    </div>
+
+    {% else %}
+
+        <h1>Necesitas <a href="{% url 'login' %}"> Iniciar Sesión </a>para crear un Post</h1>
+        
+    {% endif %}
+
+{% endblock %}
